@@ -25,10 +25,10 @@ class Ship:
         self.x_start, self.y_start = start
         self.x_end, self.y_end = end
 
-        # make x_start on left and x_end on right
+        # Make x_start on left and x_end on right
         self.x_start, self.x_end = min(self.x_start, self.x_end), max(self.x_start, self.x_end)
         
-        # make y_start on top and y_end on bottom
+        # Make y_start on top and y_end on bottom
         self.y_start, self.y_end = min(self.y_start, self.y_end), max(self.y_start, self.y_end)
 
         if not self.is_horizontal() and not self.is_vertical():
@@ -58,7 +58,7 @@ class Ship:
         Returns:
             bool : True if the ship is vertical. False otherwise.
         """
-        # TODO: Complete this method
+     
         if self.x_start == self.x_end:
             return True
         return False
@@ -69,7 +69,7 @@ class Ship:
         Returns:
             bool : True if the ship is horizontal. False otherwise.
         """
-        # TODO: Complete this method
+   
         if self.y_start == self.y_end:
             return True
         return False
@@ -85,7 +85,7 @@ class Ship:
         Returns:
             set[tuple] : Set of (x ,y) coordinates of all cells a ship occupies
         """
-        # TODO: Complete this method
+
         # If horizontal, generate cells horizontally, if vertical, vertically
         if self.is_horizontal():
             # Generate list of x coordinates
@@ -128,7 +128,7 @@ class Ship:
             bool : return True if the given cell is one of the cells occupied 
                 by the ship. Otherwise, return False
         """
-        # TODO: Complete this method
+
         if cell in self.cells:
             return True
         return False
@@ -149,7 +149,7 @@ class Ship:
             bool : return True if the ship is occupying cell (ship is hit). 
                 Return False otherwise.
         """
-        # TODO: Complete this method
+
         if self.is_occupying_cell(cell):
             self.damaged_cells.add(cell)
             return True
@@ -161,7 +161,7 @@ class Ship:
         Returns:
             int : the number of cells that are damaged.
         """
-        # TODO: Complete this method
+
         return len(self.damaged_cells)
         
     def has_sunk(self):
@@ -171,7 +171,7 @@ class Ship:
             bool : return True if the ship is damaged at all its positions. 
                 Otherwise, return False
         """
-        # TODO: Complete this method
+
         if self.length() == self.count_damaged_cells():
             return True
         return False
@@ -190,7 +190,6 @@ class Ship:
         """
         assert isinstance(other_ship, Ship)
         
-        # TODO: Complete this method
         # Check if any cell of other_ship is near our ship
         for cell in other_ship.cells:
             if self.is_near_cell(cell):

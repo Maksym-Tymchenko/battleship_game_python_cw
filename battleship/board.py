@@ -84,7 +84,6 @@ class Board:
                 ships on the board that are near each other. Returns False 
                 otherwise
         """
-        # TODO: Complete this method
         for ship_1 in self.ships:
             for ship_2 in self.ships:
                 # If we are not considering the same ship
@@ -105,7 +104,6 @@ class Board:
             bool : return True if all ships on the board have sunk.
                return False otherwise.
         """
-        # TODO: Complete this method
         # Check the sunk status for each ship in the fleet
         sunk_status = [ship.has_sunk() for ship in self.ships]
         # Return True if all the ships have sunk
@@ -131,7 +129,6 @@ class Board:
         # Mark the cell that has been attacked for visualisation purposes
         self.marked_cells.add(cell)
         
-        # TODO: Complete this method
         for ship in self.ships:
             # If we find a ship that contains this cell, give damage to ship and check if it is sunk
             if ship.is_occupying_cell(cell):
