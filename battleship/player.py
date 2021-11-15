@@ -170,6 +170,10 @@ class AutomaticPlayer(Player):
         # Create set of cells that it doesn't make sense to attack
         self.do_not_attack_set = set()
 
+        # Remember result of last hit
+        self.was_last_hit = False
+        self.was_last_sunk = False
+
         # Create a set of hit cells so far
         self.hit_so_far = set()
 
@@ -196,10 +200,28 @@ class AutomaticPlayer(Player):
                 next attack
         """
         # TODO: Complete this method
+        if self.was_last_hit:
+            
+            (x_coord, y_coord) = self.last_attacked_cell
+            horizontal_neighbours = [(min(x_coord + 1, self.board.width), y_coord), (max(x_coord - 1, 1), y_coord)]
+            vertical_neighbours = [(x_coord, min(y_coord + 1, self.board.height)), (x_coord, max(y_coord - 1, 1))]
+            neighbours = set(horizontal_neighbours + vertical_neighbours)
+            print(f"Last was a hit, the neighbours are: {neighbours}")
+            already_attacked = True
+            for target_cell in neighbours:
+                already_attacked = target_cell in self.do_not_attack_set
+                if not already_attacked:
+                    # Remember the cell that you are about to attack
+                    self.do_not_attack_set.add(target_cell)
+                    self.last_attacked_cell = target_cell
+                    return target_cell
+        
+        # If last was not a hit or all neighbours were already attacked
+        # Generate random target
         target_cell = self.generate_random_target()
-        self.do_not_attack_set.add(target_cell)
 
         # Remember the cell that you are about to attack
+        self.do_not_attack_set.add(target_cell)
         self.last_attacked_cell = target_cell
 
         return target_cell
@@ -246,11 +268,16 @@ class AutomaticPlayer(Player):
         """
 
         # Add last attacked cell to set of hit cells
+        self.was_last_hit = False
         if is_ship_hit:
             self.hit_so_far.add(self.last_attacked_cell)
+            self.was_last_hit = True
+            
 
         # If ship sunk add it to the set of sunk ships
+        self.was_last_sunk = False
         if has_ship_sunk:
+            self.was_last_sunk = True
             # print(f"Last attacked cell: {self.last_attacked_cell} of type {type(self.last_attacked_cell)}")
             # Intialize set that contains all of the cells belonging to the sunk ship
             ship_cells = set()
@@ -264,9 +291,8 @@ class AutomaticPlayer(Player):
             while ship_cells != checked_cells:
                 # Take a snapshot of the current ship cells to iterate over it
                 current_ship_cells = ship_cells.copy()
-                print(ship_cells is current_ship_cells)
-                print(f"Ship cells: {ship_cells} of type {type(ship_cells)}")
-                print(f"Checked cells: {checked_cells} of type {type(checked_cells)}")
+                # print(f"Ship cells: {ship_cells} of type {type(ship_cells)}")
+                # print(f"Checked cells: {checked_cells} of type {type(checked_cells)}")
                 for current_cell in current_ship_cells:
                     # Find adjacent previously hit cells of the current cell
                     if current_cell not in checked_cells:
@@ -291,7 +317,7 @@ class AutomaticPlayer(Player):
             self.do_not_attack_neighbours(sunk_ship)
             
             # print(f"Do not attack set after update: {self.do_not_attack_set}")
-
+            
         return None
 
     def create_ship_from_cells(self, ship_cells):
