@@ -266,6 +266,12 @@ class ShipFactory:
 
     def generate_ships(self):
         """ Generate a list of ships in the appropriate configuration.
+
+        This function uses the helper function try_generate_ships in a loop
+        until it generates a valid set of ships. This is because it is possible
+        that the first run of try_generate_ships positions the first ships in such
+        a way that it is not possible to position any further ship 
+        (when we have a small grid such as 7 by 7).
         
         The number and length of ships generated must obey the specifications 
         given in self.ships_per_length.
@@ -277,7 +283,6 @@ class ShipFactory:
         Returns:
             list[Ships] : A list of Ship instances, adhering to the rules above
         """
-        # TODO: Complete this method
 
         def try_generate_ships():
             """ Helper function that tries to generate a valid set of ships. """
