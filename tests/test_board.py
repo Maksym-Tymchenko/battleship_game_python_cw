@@ -17,6 +17,22 @@ def test_board():
     assert is_ship_hit == True
     assert has_ship_sunk == False
 
+    # Check if can sink a ship
+
+    is_ship_hit, is_ship_sunk = board.is_attacked_at((3, 1))
+    is_ship_hit, is_ship_sunk = board.is_attacked_at((3, 2))
+    is_ship_hit, is_ship_sunk = board.is_attacked_at((3, 3))
+    is_ship_hit, is_ship_sunk = board.is_attacked_at((3, 4))
+    is_ship_hit, is_ship_sunk = board.is_attacked_at((3, 5))
+    print(is_ship_hit, is_ship_sunk)
+    assert is_ship_hit == True
+    assert is_ship_sunk == True 
+
+    # Visualize check that sunk ship marked with dollars
+    board.print(show_ships=True)
+    
+
+
 
 if __name__ == "__main__":
     test_board()

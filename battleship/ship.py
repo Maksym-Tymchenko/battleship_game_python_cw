@@ -1,4 +1,4 @@
-import random
+import random, time
 
 from battleship.convert import CellConverter
 
@@ -13,6 +13,8 @@ class Ship:
         Args:
             start (tuple[int, int]): tuple of 2 positive integers representing
                 the starting cell coordinates of the Ship on the board
+                where the first number is the horizontal coordinate x
+                that is represented as a letter on the board
             end (tuple[int, int]): tuple of 2 positive integers representing
                 the ending cell coordinates of the Ship on the board
 
@@ -30,8 +32,13 @@ class Ship:
         self.y_start, self.y_end = min(self.y_start, self.y_end), max(self.y_start, self.y_end)
 
         if not self.is_horizontal() and not self.is_vertical():
-            raise ValueError("The given coordinates are invalid."
+            raise ValueError("The given coordinates are invalid. "
                 "The ship needs to be either horizontal or vertical.")
+        
+        # Make sure coords are positive
+        if not self.x_start > 0 or not self.y_start > 0:
+            raise ValueError("The given coordinates are invalid. "
+                "Coordinates must be positive.")
 
         # Set of all (x,y) cell coordinates that the ship occupies
         self.cells = self.get_cells()
@@ -52,6 +59,8 @@ class Ship:
             bool : True if the ship is vertical. False otherwise.
         """
         # TODO: Complete this method
+        if self.x_start == self.x_end:
+            return True
         return False
    
     def is_horizontal(self):
@@ -61,6 +70,8 @@ class Ship:
             bool : True if the ship is horizontal. False otherwise.
         """
         # TODO: Complete this method
+        if self.y_start == self.y_end:
+            return True
         return False
     
     def get_cells(self):
@@ -75,7 +86,26 @@ class Ship:
             set[tuple] : Set of (x ,y) coordinates of all cells a ship occupies
         """
         # TODO: Complete this method
-        return set()
+        # If horizontal, generate cells horizontally, if vertical, vertically
+        if self.is_horizontal():
+            # Generate list of x coordinates
+            x_coords = list(range(self.x_start, self.x_end+1))
+            # Generate list of y coords
+            y_coords = [self.y_start]*len(x_coords)
+            # Zip each x and y in a tuple to represent a cell
+            zipped = zip(x_coords, y_coords)
+            coords_set = set(zipped)
+
+        elif self.is_vertical:
+            # Generate list of y coordinates
+            y_coords = list(range(self.y_start, self.y_end+1))
+            # Generate list of x coords
+            x_coords = [self.x_start]*len(y_coords)
+            # Zip each x and y in a tuple to represent a cell
+            zipped = zip(x_coords, y_coords)
+            coords_set = set(zipped)
+
+        return coords_set
 
     def length(self):
         """ Get length of ship (the number of cells the ship occupies).
@@ -83,8 +113,9 @@ class Ship:
         Returns:
             int : The number of cells the ship occupies
         """
-        # TODO: Complete this method
-        return 0
+        # Count number of ship cells
+        ship_len = len(self.cells)
+        return ship_len
 
     def is_occupying_cell(self, cell):
         """ Check whether the ship is occupying a given cell
@@ -98,6 +129,8 @@ class Ship:
                 by the ship. Otherwise, return False
         """
         # TODO: Complete this method
+        if cell in self.cells:
+            return True
         return False
     
     def receive_damage(self, cell):
@@ -117,6 +150,9 @@ class Ship:
                 Return False otherwise.
         """
         # TODO: Complete this method
+        if self.is_occupying_cell(cell):
+            self.damaged_cells.add(cell)
+            return True
         return False
     
     def count_damaged_cells(self):
@@ -126,7 +162,7 @@ class Ship:
             int : the number of cells that are damaged.
         """
         # TODO: Complete this method
-        return 0
+        return len(self.damaged_cells)
         
     def has_sunk(self):
         """ Check whether the ship has sunk.
@@ -136,6 +172,8 @@ class Ship:
                 Otherwise, return False
         """
         # TODO: Complete this method
+        if self.length() == self.count_damaged_cells():
+            return True
         return False
     
     def is_near_ship(self, other_ship):
@@ -153,6 +191,10 @@ class Ship:
         assert isinstance(other_ship, Ship)
         
         # TODO: Complete this method
+        # Check if any cell of other_ship is near our ship
+        for cell in other_ship.cells:
+            if self.is_near_cell(cell):
+                return True
         return False
 
     def is_near_cell(self, cell):
@@ -237,26 +279,108 @@ class ShipFactory:
             list[Ships] : A list of Ship instances, adhering to the rules above
         """
         # TODO: Complete this method
-        ships = []
-        return ships
+
+        def try_generate_ships():
+            """ Helper function that tries to generate a valid set of ships. """
+            ships = []
+            for ship_length, num_ships in self.ships_per_length.items():
+                for i in range(num_ships):
+
+                    # Generate a random ship until it is valid
+                    is_valid_candidate = False
+                    start_time = time.time()
+                    while not is_valid_candidate:
+
+                        # Check how much time spent in while loop, if more than 1 sec, break
+                        current_time = time.time()
+                        elapsed_time = current_time - start_time
+                        if elapsed_time > 1:
+                            # print("Couldn't find a valid set of ships.")
+                            return []
+
+                        # Generate random orientation (0 for vertical, 1 for horizontal)
+                        orient = random.randint(0,1)
+                        
+                        if orient == 0:
+                            # Create a vertical ship
+                            # Generate random start_x coordinate
+                            start_x = random.randint(1, self.board_size[0])
+                            end_x = start_x
+                            # Generate random start_y coordinate, such that end_y is inside board
+                            start_y = random.randint(1, self.board_size[1] - (ship_length - 1))
+                            end_y = start_y + ship_length - 1
+
+                        elif orient == 1:
+                            # Create a horizontal ship
+                            # Generate random start_x coordinate, such that end_x is inside board
+                            start_x = random.randint(1, self.board_size[0] - (ship_length - 1))
+                            end_x = start_x + ship_length - 1
+                            # Generate random start_y coordinate
+                            start_y = random.randint(1, self.board_size[1])
+                            end_y = start_y
+
+                        # Create candidate ship
+                        start = (start_x, start_y) 
+                        end = (end_x, end_y)
+                        ship_cand = Ship(start, end)
+
+                        # Check if candidate ship is near existing ships
+                        is_close_ship = False
+                        for ship in ships:
+                            is_close_ship = ship.is_near_ship(ship_cand)
+                            # Break loop if found at least one close ship
+                            if is_close_ship:
+                                break
+                        
+                        is_valid_candidate = not is_close_ship
+
+                    # Append valid candidate to list of ships
+                    ships.append(ship_cand)
+
+            # Return generated ships in the helper function
+            return ships
+
+        # Try to generate a valid set of ships
+        generated_ships = []
+        start_time = time.time()
+        while not generated_ships:
+            # Stop trying if can't find valid set of ships in 10 seconds
+            current_time = time.time()
+            elapsed_time = current_time - start_time
+            if elapsed_time > 10:
+                break
+            # Use helper function to try to generate a set of ships
+            generated_ships = try_generate_ships()
+
+        return generated_ships
         
         
 if __name__ == '__main__':
     # SANDBOX for you to play and test your methods
 
     ship = Ship(start=(3, 3), end=(5, 3))
-    print(ship.get_cells())
-    print(ship.length())
-    print(ship.is_horizontal())
-    print(ship.is_vertical())
-    print(ship.is_near_cell((5, 3)))
+    # ship = Ship(start=(5, 3), end=(5, 3))
+    # print(ship.is_horizontal())
+    # print(ship.is_vertical())
+
+    # print(ship.get_cells())
+    # print(ship.length())
+    # print(ship.is_horizontal())
+    # print(ship.is_vertical())
+    # print(ship.is_occupying_cell((4, 3)))
+    # # print(ship.is_near_cell((5, 3)))
     
-    print(ship.receive_damage((4, 3)))
-    print(ship.receive_damage((10, 3)))
-    print(ship.damaged_cells)
+
+    # print(ship.receive_damage((4, 3)))
+    # print(ship.receive_damage((5, 3)))
+    # print(ship.has_sunk())
+    # print(ship.receive_damage((3, 3)))
+    # print(ship.damaged_cells)
+    # print(ship.length())
+    # print(ship.has_sunk())
     
-    ship2 = Ship(start=(4, 1), end=(4, 5))
-    print(ship.is_near_ship(ship2))
+    # ship2 = Ship(start=(2, 1), end=(2, 2))
+    # print(ship.is_near_ship(ship2))
 
     # For Task 3
     ships = ShipFactory().generate_ships()

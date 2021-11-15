@@ -85,6 +85,17 @@ class Board:
                 otherwise
         """
         # TODO: Complete this method
+        for ship_1 in self.ships:
+            for ship_2 in self.ships:
+                # If we are not considering the same ship
+                if ship_1 is not ship_2:
+                    # Check whether the ships are too close
+                    are_too_close = ship_1.is_near_ship(ship_2)
+                    if are_too_close:
+                        print(f"The following 2 ships are too close: ")
+                        print(ship_1)
+                        print(ship_2)
+                        return True
         return False
         
     def have_all_ships_sunk(self):
@@ -95,6 +106,11 @@ class Board:
                return False otherwise.
         """
         # TODO: Complete this method
+        # Check the sunk status for each ship in the fleet
+        sunk_status = [ship.has_sunk() for ship in self.ships]
+        # Return True if all the ships have sunk
+        if all(sunk_status):
+            return True
         return False
     
     def is_attacked_at(self, cell):
@@ -116,6 +132,14 @@ class Board:
         self.marked_cells.add(cell)
         
         # TODO: Complete this method
+        for ship in self.ships:
+            # If we find a ship that contains this cell, give damage to ship and check if it is sunk
+            if ship.is_occupying_cell(cell):
+                is_ship_hit = True
+                ship.receive_damage(cell)
+                is_ship_sunk = ship.has_sunk()
+                return (is_ship_hit, is_ship_sunk)
+        
         return False, False
         
     def print(self, show_ships=False):
@@ -175,25 +199,24 @@ class Board:
 
 
 if __name__ == '__main__':
-    # SANDBOX for you to play and test your methods
+    # # SANDBOX for you to play and test your methods
 
-    ships = [
-        Ship(start=(3, 1), end=(3, 5)),  # length = 5
-        Ship(start=(9, 7), end=(9, 10)),  # length = 4
-        Ship(start=(1, 9), end=(3, 9)),  # length = 3
-        Ship(start=(5, 2), end=(6, 2)),  # length = 2
-        Ship(start=(8, 3), end=(8, 3)),  # length = 1
-    ]
+    # ships = [
+    #     Ship(start=(3, 1), end=(3, 5)),  # length = 5
+    #     Ship(start=(9, 7), end=(9, 10)),  # length = 4
+    #     Ship(start=(1, 9), end=(3, 9)),  # length = 3
+    #     Ship(start=(5, 2), end=(6, 2)),  # length = 2
+    #     Ship(start=(8, 3), end=(8, 3)),  # length = 1
+    # ]
     
-    # Board with manually specified ships
-    board = Board(ships=ships)
-    print(board.ships)
-    board.print(show_ships=True)
-    is_ship_hit, is_ship_sunk = board.is_attacked_at((3, 4))
-    print(is_ship_hit, is_ship_sunk)
+    # # Board with manually specified ships
+    # board = Board(ships=ships)
+    # print(board.ships)
+    # board.print(show_ships=True)
+
     
-    # Automatic board
-    board = Board()
+    # # Automatic board
+    board = Board(None, (10, 10))
     print(board.ships)
     board.print(show_ships=True)
     
