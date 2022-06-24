@@ -1,4 +1,10 @@
-# COMP70053 - Python Programming - 2021 - Coursework 3
+# Battleship Game Python Coursework
+
+## Context
+
+This is a coursework assignment that I completed as part of my Python module in my MSc Artificial Intelligence. The details of the coursework are described in <em>description.pdf</em>. My contribution consisted in completing some of the classes in the existing project structure described below in order to create a battleship game that has manual, automatic and AI mode.
+
+You can play the game against an AI player by cloning the repository and running `python3 main.py 2`.
 
 ## Project Structure
 
