@@ -4,6 +4,11 @@
 
 This is a coursework assignment that I completed as part of my Python module in my MSc Artificial Intelligence. The details of the coursework are described in <em>description.pdf</em>. My contribution consisted in completing some of the classes in the existing project structure described below in order to create a battleship game that has manual, automatic and AI mode.
 
+<p align="center">
+<img src="battleship_demo.gif"      
+alt="Game demo"/>
+<p/>
+
 ## Play Game
 
 You can play the game against an automatic AI player by cloning the repository and running `python3 main.py 3`. 
